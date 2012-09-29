@@ -41,6 +41,16 @@ var GoogleBundle = (function() {
     }
 
     /**
+     * Initialize GoogleMap
+     */
+    MapWrapper.prototype.clear = function () {
+        jQuery.each(this.markers, function(index, marker) {
+            marker.setVisible(false);
+        });
+        this.markers = [];
+    }
+
+    /**
      * Fit map to markers (also calculates zoom)
      */
     MapWrapper.prototype.fitToMarkers = function () {
@@ -86,3 +96,26 @@ var GoogleBundle = (function() {
         Map: Map
     }
 }());
+
+var GoogleBundleSearch = function() {
+    var search = document.forms['GoogleBundleSearchForm']['GoogleBundleSearch_search'].value;
+    $.ajax({
+        async: false,
+        url: '/google/cities/' + search,
+        success: function(data) {
+            if ('undefined' !== typeof GoogleBundle) {
+                GoogleBundle.Map("pso-garage-map").clear();
+                jQuery.each(data, function(index, marker) {
+                    GoogleBundle.Map("pso-garage-map").addMarker(marker.lat, marker.lng, marker.text);
+                });
+                GoogleBundle.Map("pso-garage-map").fitToMarkers(true);
+            }
+        },
+        error: function(errorData) {
+            if (console) {
+                console.log(errorData);
+            }
+        }
+
+    });
+};
