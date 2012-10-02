@@ -57,12 +57,17 @@ class MapController extends Controller
                     ) {
                         $localization['lat']    = $result->geometry->location->lat;
                         $localization['lng']    = $result->geometry->location->lng;
-                        $localization['name'] = $result->formatted_address;
-                        $markers[] = $localization;
+                        $localization['name']   = $result->formatted_address;
+                        $markers[]              = $localization;
                     }
                 }
-                $status = 200;
+            } else {
+                $markers = array();
             }
+            $status = 200;
+        } else {
+            $status = 500;
+            $markers = array();
         }
         curl_close($ch);
 
