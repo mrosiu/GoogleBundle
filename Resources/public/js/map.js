@@ -37,7 +37,10 @@ var GoogleBundle = (function() {
             infowindow.open(this.map, marker);
             mapwrapper.currentInfowindow = infowindow;
         });
+        marker.setVisible(true);
         this.markers.push(marker);
+
+        return marker;
     }
 
     /**
@@ -46,6 +49,7 @@ var GoogleBundle = (function() {
     MapWrapper.prototype.clear = function () {
         jQuery.each(this.markers, function(index, marker) {
             marker.setVisible(false);
+            marker = null;
         });
         this.markers = [];
     }
