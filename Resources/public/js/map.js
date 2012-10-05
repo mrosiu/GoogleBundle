@@ -16,6 +16,7 @@ var GoogleBundle = (function() {
      * Initialize GoogleMap
      */
     MapWrapper.prototype.initialize = function (options) {
+        google.maps.Marker.prototype.data = '';
         this.map = new google.maps.Map(document.getElementById(this.id), options);
     }
 
@@ -26,9 +27,9 @@ var GoogleBundle = (function() {
         var marker = new google.maps.Marker({ 
                 position: new google.maps.LatLng(latitude, longitude),
                 map: this.map,
-                title: text
+                data: text
         })
-        var infowindow = new google.maps.InfoWindow({ content: text });
+        var infowindow = new google.maps.InfoWindow({ content: '' });
 
         var mapwrapper = this;
         google.maps.event.addListener(marker, "click", function () {
@@ -44,9 +45,6 @@ var GoogleBundle = (function() {
         return marker;
     }
 
-    /**
-     * Initialize GoogleMap
-     */
     MapWrapper.prototype.clear = function () {
         jQuery.each(this.markers, function(index, marker) {
             marker.setVisible(false);
