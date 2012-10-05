@@ -31,7 +31,7 @@ class MapController extends Controller
      */
     public function citiesAction($search)
     {
-        $url = 'http://maps.google.com/maps/api/geocode/json?address=' . urlencode($search) . '&sensor=false';
+        $url = 'http://maps.google.com/maps/geo?hl=pl&output=json&oe=utf8&q=' . urlencode($search);
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
@@ -48,17 +48,31 @@ class MapController extends Controller
         );
         if (200 === curl_getinfo($ch, CURLINFO_HTTP_CODE)) {
             $response = json_decode($response);
-            if (!empty($response->results)) {
-                foreach ($response->results as $result) {
-                    if (isset($result->geometry)
-                        && isset($result->geometry->location)
-                        && isset($result->geometry->location->lat)
-                        && isset($result->geometry->location->lng)
+            if (!empty($response->Placemark)) {
+                foreach ($response->Placemark as $result) {
+                    if (isset($result->Point)
+                        && isset($result->Point->coordinates)
                     ) {
-                        $localization['lat']    = $result->geometry->location->lat;
-                        $localization['lng']    = $result->geometry->location->lng;
-                        $localization['name']   = $result->formatted_address;
-                        $markers[]              = $localization;
+                        $localization['lat']    = $result->Point->coordinates[1];
+                        $localization['lng']    = $result->Point->coordinates[0];
+                        $localization['name']   = $result->address;
+                        if (isset($result->AddressDetails->Country->AdministrativeArea->AdministrativeAreaName)) {
+                            $localization['province'] = $result->AddressDetails->Country->AdministrativeArea->AdministrativeAreaName;
+                        }
+                        if (isset($result->AddressDetails->Country->AdministrativeArea->SubAdministrativeArea->Locality)) {
+                            $address = $result->AddressDetails->Country->AdministrativeArea->SubAdministrativeArea->Locality;
+                            if (isset($address->PostalCode)) {
+                                foreach ($address->PostalCode as $postCode) {
+                                    $localization['postCode'] = $postCode;
+                                }
+                            }
+                            if (isset($address->Thoroughfare)
+                                && isset($address->Thoroughfare->ThoroughfareName)
+                            ) {
+                                $localization['street'] = $address->Thoroughfare->ThoroughfareName;
+                            }
+                        }
+                        $markers[] = $localization;
                     }
                 }
             } else {
