@@ -25,10 +25,11 @@ var GoogleBundle = (function() {
     MapWrapper.prototype.addMarker = function (latitude, longitude, text) {
         var marker = new google.maps.Marker({ 
                 position: new google.maps.LatLng(latitude, longitude),
-                map: this.map
+                map: this.map,
+                title: text
         })
         var infowindow = new google.maps.InfoWindow({ content: text });
-        
+
         var mapwrapper = this;
         google.maps.event.addListener(marker, "click", function () {
             if (mapwrapper.currentInfowindow) {
