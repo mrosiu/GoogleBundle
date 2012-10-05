@@ -41,11 +41,6 @@ class MapController extends Controller
 
         $status = 404;
         $markers = array();
-        $localization = array(
-            'lat'   => 0,
-            'lng'   => 0,
-            'name'  => ''
-        );
         if (200 === curl_getinfo($ch, CURLINFO_HTTP_CODE)) {
             $response = json_decode($response);
             if (!empty($response->Placemark)) {
@@ -53,14 +48,17 @@ class MapController extends Controller
                     if (isset($result->Point)
                         && isset($result->Point->coordinates)
                     ) {
+                        $localization = array();
                         $localization['lat']    = $result->Point->coordinates[1];
                         $localization['lng']    = $result->Point->coordinates[0];
-                        $localization['name']   = $result->address;
                         if (isset($result->AddressDetails->Country->AdministrativeArea->AdministrativeAreaName)) {
                             $localization['province'] = $result->AddressDetails->Country->AdministrativeArea->AdministrativeAreaName;
                         }
                         if (isset($result->AddressDetails->Country->AdministrativeArea->SubAdministrativeArea->Locality)) {
                             $address = $result->AddressDetails->Country->AdministrativeArea->SubAdministrativeArea->Locality;
+                            if (isset($address->LocalityName)) {
+                                $localization['name'] = $address->LocalityName;
+                            }
                             if (isset($address->PostalCode)) {
                                 foreach ($address->PostalCode as $postCode) {
                                     $localization['postCode'] = $postCode;
