@@ -24,12 +24,12 @@ var GoogleBundle = (function() {
      * Add marker to map by coordinates. Text is optional for marker's infowindow
      */
     MapWrapper.prototype.addMarker = function (latitude, longitude, text) {
-        var marker = new google.maps.Marker({ 
+        var marker = new google.maps.Marker({
                 position: new google.maps.LatLng(latitude, longitude),
                 map: this.map,
-                data: text
+                text: text
         })
-        var infowindow = new google.maps.InfoWindow({ content: '' });
+        var infowindow = new google.maps.InfoWindow({ content: text });
 
         var mapwrapper = this;
         google.maps.event.addListener(marker, "click", function () {
