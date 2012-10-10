@@ -45,14 +45,18 @@ var GoogleBundle = (function() {
         return marker;
     }
 
-    MapWrapper.prototype.clear = function () {
+    MapWrapper.prototype.clear = function (close) {
         jQuery.each(this.markers, function(index, marker) {
             marker.setVisible(false);
-            marker.setMap(null);
             marker = null;
         });
+        if ('undefined' !== typeof close && true === close) {
+            if (this.currentInfowindow) {
+                this.currentInfowindow.close();
+            }
+        }
         this.markers = [];
-    }
+     }
 
     /**
      * Fit map to markers (also calculates zoom)

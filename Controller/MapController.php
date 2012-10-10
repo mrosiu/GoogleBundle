@@ -70,7 +70,7 @@ class MapController extends Controller
                                 $localization['street'] = $address->Thoroughfare->ThoroughfareName;
                             }
                         }
-                        $localization['text'] = json_encode($localization);
+                        $localization['text'] = '';
                         $markers[] = $localization;
                     }
                 }
