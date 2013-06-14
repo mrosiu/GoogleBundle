@@ -65,6 +65,21 @@ class GoogleExtension extends Extension
             if (isset($config['trackers'])) {
                 $container->setParameter('google.analytics.trackers', $config['trackers']);
             }
+            if (isset($config['dashboard'])) {
+                $container->setParameter('google.analytics.dashboard', $config['dashboard']);
+            }
+            if (isset($config['whitelist'])) {
+                $container->setParameter('google.analytics.whitelist', $config['whitelist']);
+            }
+            if (isset($config['js_source_https'])) {
+                $container->setParameter('google.analytics.js_source_https', $config['js_source_https']);
+            }
+            if (isset($config['js_source_http'])) {
+                $container->setParameter('google.analytics.js_source_http', $config['js_source_http']);
+            }
+            if (isset($config['js_source_endpoint'])) {
+                $container->setParameter('google.analytics.js_source_endpoint', $config['js_source_endpoint']);
+            }
         }
     }
 

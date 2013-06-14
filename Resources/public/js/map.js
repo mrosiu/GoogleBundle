@@ -16,6 +16,7 @@ var GoogleBundle = (function() {
      * Initialize GoogleMap
      */
     MapWrapper.prototype.initialize = function (options) {
+        google.maps.Marker.prototype.data = '';
         this.map = new google.maps.Map(document.getElementById(this.id), options);
     }
 
@@ -23,12 +24,13 @@ var GoogleBundle = (function() {
      * Add marker to map by coordinates. Text is optional for marker's infowindow
      */
     MapWrapper.prototype.addMarker = function (latitude, longitude, text) {
-        var marker = new google.maps.Marker({ 
+        var marker = new google.maps.Marker({
                 position: new google.maps.LatLng(latitude, longitude),
-                map: this.map
+                map: this.map,
+                text: text
         })
         var infowindow = new google.maps.InfoWindow({ content: text });
-        
+
         var mapwrapper = this;
         google.maps.event.addListener(marker, "click", function () {
             if (mapwrapper.currentInfowindow) {
@@ -37,8 +39,24 @@ var GoogleBundle = (function() {
             infowindow.open(this.map, marker);
             mapwrapper.currentInfowindow = infowindow;
         });
+        marker.setVisible(true);
         this.markers.push(marker);
+
+        return marker;
     }
+
+    MapWrapper.prototype.clear = function (close) {
+        jQuery.each(this.markers, function(index, marker) {
+            marker.setVisible(false);
+            marker = null;
+        });
+        if ('undefined' !== typeof close && true === close) {
+            if (this.currentInfowindow) {
+                this.currentInfowindow.close();
+            }
+        }
+        this.markers = [];
+     }
 
     /**
      * Fit map to markers (also calculates zoom)

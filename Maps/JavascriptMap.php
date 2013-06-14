@@ -163,8 +163,9 @@ class JavascriptMap extends AbstractMap
                 $meta = $marker->getMeta();
                 $infowindow = isset($meta['infowindow']) ? $meta['infowindow'] : '';
 
-                $content .= sprintf('GoogleBundle.Map("%s").addMarker(%F, %F, "%s"); ',
-                    $this->id, $marker->getLatitude(), $marker->getLongitude(), $infowindow);
+                $content .= sprintf("GoogleBundle.Map(\"%s\").addMarker(%s);\n",
+                    $this->id, substr(json_encode(array($marker->getLatitude(), $marker->getLongitude(), $infowindow)), 1, -1)
+                );
             }
         }
 
