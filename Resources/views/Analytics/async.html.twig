@@ -1,101 +1,132 @@
 <script type="text/javascript">
-	if ( _gaq == null || typeof(_gaq) != 'array') { var _gaq = window._gaq = []; }
+if (AntiMattr == null || typeof(AntiMattr) != 'object') { var AntiMattr = window.AntiMattr = {}; }
+AntiMattr.GoogleAnalytics = {};
 
-	{% for key, tracker in google_analytics.trackers %}
-	_gaq.push(function() {
-		var {{ tracker.name }} = _gaq._createAsyncTracker('{{ tracker.accountId }}','{{ tracker.name }}');
-	});
-	{% if tracker.domain %}
-	_gaq.push(['{{ tracker.name }}._setDomainName', '{{ tracker.domain }}']);
-
-	{% if google_analytics.getAllowLinker(key) %}
-	_gaq.push(['{{ tracker.name }}._setAllowLinker', true ]);
-	{% else %}
-	_gaq.push(['{{ tracker.name }}._setAllowLinker', false ]);
-	{% endif %}
-
-	{% if google_analytics.getAllowHash(key) %}
-	_gaq.push(['{{ tracker.name }}._setAllowHash', true ]);
-	{% else %}
-	_gaq.push(['{{ tracker.name }}._setAllowHash', false ]);
-	{% endif %}
-	{% endif %}
-
-	{% if google_analytics.hasCustomVariables %}
-	{% for customVariable in google_analytics.customVariables %}
-		_gaq.push(['{{ tracker.name }}._setCustomVar', {{ customVariable.index }}, '{{ customVariable.name }}', '{{ customVariable.value }}', {{ customVariable.scope }}]);
-	{% endfor %}
-	{% endif %}
-
-	{% if google_analytics.hasPageViewQueue %}
-	{% for pageView in google_analytics.pageViewQueue %}
-		_gaq.push(['{{ tracker.name }}._trackPageview', '{{ pageView }}']);
-	{% endfor %}
-	{% endif %}
-
-    {% if google_analytics.hasCustomPageView %}
-    _gaq.push(['{{ tracker.name }}._trackPageview', '{{ google_analytics.getCustomPageView() }}']);
-    {% else %}
-    if (window.location.hash) {
-        _gaq.push(['{{ tracker.name }}._trackPageview', '{{ google_analytics.getRequestUri() }}'+window.location.hash]);
+AntiMattr.GoogleAnalytics.onGatLoad = function(callback) {
+    if (typeof _gat != "undefined") {
+        callback();
     } else {
-        _gaq.push(['{{ tracker.name }}._trackPageview', '{{ google_analytics.getRequestUri() }}']);
+        var listener = this;
+        setTimeout(function(){
+            listener.onGatLoad(callback);					
+        },100);
     }
-	{% endif %}
+};
 
-    {% if google_analytics.getTrackPageLoadTime(key) %}
-    _gaq.push(['{{ tracker.name }}._trackPageLoadTime']);
+AntiMattr.GoogleAnalytics.notifyEvent = function(tracker, category, action, label, value) {
+    var event = [tracker + '_trackEvent', category, action];
+    if (typeof label != 'undefined') {
+        event.push(label);
+        if (typeof value != 'undefined') {
+            event.push(value);
+        }
+    }
+    _gaq.push(event);
+};
+
+if ( _gaq == null || typeof(_gaq) != 'array') { var _gaq = window._gaq = []; }
+
+{% for key, tracker in google_analytics.trackers %}
+    _gaq.push(['{{ google_analytics.trackerName(key) }}_setAccount', '{{ tracker.accountId }}']);
+
+    {% if tracker.domain %}
+        _gaq.push(['{{ google_analytics.trackerName(key) }}_setDomainName', '{{ tracker.domain }}']);
+
+        {% if google_analytics.getAllowAnchor(key) %}
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_setAllowAnchor', true ]);
+        {% else %}
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_setAllowAnchor', false ]);
+        {% endif %}
+
+        {% if google_analytics.getAllowLinker(key) %}
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_setAllowLinker', true ]);
+        {% else %}
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_setAllowLinker', false ]);
+        {% endif %}
+
+        {% if google_analytics.getAllowHash(key) %}
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_setAllowHash', true ]);
+        {% else %}
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_setAllowHash', false ]);
+        {% endif %}
     {% endif %}
 
-	{% if google_analytics.isTransactionValid %}
-	{% set transaction = google_analytics.transaction %}
-	_gaq.push(['{{ tracker.name }}._addTrans',
-		'{{ transaction.orderNumber | escape('js') }}', // order number required
-		'{{ transaction.affiliation | escape('js') }}', // affiliation optional
-		'{{ transaction.total | escape('js') }}', // total optional
-		'{{ transaction.tax | escape('js') }}', // tax optional
-		'{{ transaction.shipping | escape('js') }}', // shipping optional
-		'{{ transaction.city | escape('js') }}', // city optional
-		'{{ transaction.state | escape('js') }}', // state optional
-		'{{ transaction.country | escape('js') }}' // country optional
-	]);
+    {% if google_analytics.hasCustomVariables %}
+        {% for customVariable in google_analytics.customVariables %}
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_setCustomVar', {{ customVariable.index }}, '{{ customVariable.name }}', '{{ customVariable.value }}', {{ customVariable.scope }}]);
+        {% endfor %}
+    {% endif %}
 
-	{% if google_analytics.hasItems %}
-	{% for item in google_analytics.items %}
-	_gaq.push(['{{ tracker.name }}._addItem',
-		'{{ item.orderNumber | escape('js') }}', // order number required
-		'{{ item.sku | escape('js') }}', // sku required
-		'{{ item.name | escape('js') }}', // name optional
-		'{{ item.category | escape('js') }}', // category optional
-		'{{ item.price | escape('js') }}', // price required
-		'{{ item.quantity | escape('js') }}' // quantity required
-	]);
-	{% endfor %}
-	{% endif %}
+    {% set siteSpeedSampleRate = google_analytics.getSiteSpeedSampleRate(key) %}
+    {% if siteSpeedSampleRate is defined and siteSpeedSampleRate is not null %}
+        _gaq.push(['{{ google_analytics.trackerName(key) }}_setSiteSpeedSampleRate', {{ siteSpeedSampleRate }}]);
+    {% endif %}
 
-	_gaq.push(['{{ tracker.name }}._trackTrans']);
+    {% if google_analytics.hasPageViewQueue %}
+        {% for pageView in google_analytics.pageViewQueue %}
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_trackPageview', '{{ pageView }}']);
+        {% endfor %}
+    {% endif %}
 
-	{% endif %}
-	{% endfor %}
+    {% if google_analytics.hasCustomPageView %}
+        _gaq.push(['{{ google_analytics.trackerName(key) }}_trackPageview', '{{ google_analytics.getCustomPageView() | raw }}']);
+    {% else %}
+        if (window.location.hash) {
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_trackPageview', '{{ google_analytics.getRequestUri() | raw }}'+window.location.hash]);
+        } else {
+            _gaq.push(['{{ google_analytics.trackerName(key) }}_trackPageview', '{{ google_analytics.getRequestUri() | raw }}']);
+        }
+    {% endif %}
 
-	{% if google_analytics.hasEventQueue %}
-	{% for event in google_analytics.eventQueue %}
-    _gaq.push(['{{ tracker.name }}._trackEvent'
-        ,'{{ event.category }}' // category required
-        ,'{{ event.action }}' // action required
-        {% if event.label %}
-        ,'{{ event.label }}' // label optional 
+    {% if google_analytics.isTransactionValid %}
+        {% set transaction = google_analytics.transaction %}
+        _gaq.push(['{{ google_analytics.trackerName(key) }}_addTrans',
+            '{{ transaction.orderNumber | escape('js') }}', // order number required
+            '{{ transaction.affiliation | escape('js') }}', // affiliation optional
+            '{{ transaction.total | escape('js') }}', // total optional
+            '{{ transaction.tax | escape('js') }}', // tax optional
+            '{{ transaction.shipping | escape('js') }}', // shipping optional
+            '{{ transaction.city | escape('js') }}', // city optional
+            '{{ transaction.state | escape('js') }}', // state optional
+            '{{ transaction.country | escape('js') }}' // country optional
+        ]);
+
+        {% if google_analytics.hasItems %}
+            {% for item in google_analytics.items %}
+                _gaq.push(['{{ google_analytics.trackerName(key) }}_addItem',
+                    '{{ item.orderNumber | escape('js') }}', // order number required
+                    '{{ item.sku | escape('js') }}', // sku required
+                    '{{ item.name | escape('js') }}', // name optional
+                    '{{ item.category | escape('js') }}', // category optional
+                    '{{ item.price | escape('js') }}', // price required
+                    '{{ item.quantity | escape('js') }}' // quantity required
+                ]);
+            {% endfor %}
         {% endif %}
-        {% if event.label and event.value %}
-        ,'{{ event.value }}' // value optional but dependent on label
-        {% endif %}
-    ]);
-	{% endfor %}
-	{% endif %}
 
-	(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	})();
+        _gaq.push(['{{ google_analytics.trackerName(key) }}_trackTrans']);
+
+    {% endif %}
+
+    {% if google_analytics.hasEventQueue %}
+        AntiMattr.GoogleAnalytics.onGatLoad(function() {
+        {% for event in google_analytics.eventQueue %}
+            AntiMattr.GoogleAnalytics.notifyEvent(
+                  '{{ google_analytics.trackerName(key) }}'
+                , '{{ event.category }}'
+                , '{{ event.action }}'
+                {% if event.label is not null %}, '{{ event.label }}'{% endif %}
+                {% if event.value is not null %}, {{ event.value }}{% endif %}
+            );
+        {% endfor %}
+        });
+    {% endif %}
+
+{% endfor %}
+
+(function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? '{{ google_analytics.sourceHttps | raw }}' : '{{ google_analytics.sourceHttp | raw }}') + '{{ google_analytics.sourceEndpoint | raw }}';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
 </script>
