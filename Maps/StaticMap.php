@@ -4,7 +4,7 @@ namespace AntiMattr\GoogleBundle\Maps;
 
 class StaticMap extends AbstractMap
 {
-    const API_ENDPOINT = 'http://maps.google.com/maps/api/staticmap?';
+    const API_ENDPOINT = '//maps.google.com/maps/api/staticmap?';
     const TYPE_ROADMAP = 'roadmap';
 
     protected $height;
