@@ -4,7 +4,7 @@ namespace AntiMattr\GoogleBundle\Service;
 
 class SearchCity
 {
-    const URL   = 'http://maps.googleapis.com/maps/api/geocode/json';
+    const URL   = '//maps.google.com/maps/api/staticmap?';
 
     protected $curlManager;
 
