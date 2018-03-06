@@ -11,7 +11,7 @@ use AntiMattr\GoogleBundle\Maps\Marker;
  */
 class JavascriptMap extends AbstractMap
 {
-    const API_ENDPOINT = '//maps.google.com/maps/api/staticmap?'; //Google API endpoint
+    const API_ENDPOINT = '//maps.googleapis.com/maps/api/js?'; //Google API endpoint
 
     // Google Maps supported types:
     const TYPE_ROADMAP = 'ROADMAP';     
