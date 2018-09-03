@@ -99,17 +99,19 @@ class MapsManager
         {
             case self::MAP_JAVASCRIPT:
                 $map = new Maps\JavascriptMap();
-                $map->setId($id);
                 break;
 
             case self::MAP_STATIC;
                 $map = new Maps\StaticMap();
-                $map->setId($id);
                 break;
 
             default:
                 throw \InvalidArgumentException(sprintf('Google Map\'s type: %s is not supported', $type));
         }
+
+        $map->setId($id);
+        $map->setApiKey($this->getKey('api_key'));
+
         return $map;
     }
 }

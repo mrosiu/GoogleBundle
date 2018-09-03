@@ -199,10 +199,12 @@ class JavascriptMap extends AbstractMap
      */
     public function getGoogleMapLibrary()
     {
-        $request = static::API_ENDPOINT;
-        $request .= $this->getSensor() ? 'sensor=true&' : 'sensor=false&';
-        $request = rtrim($request, "& ");
-        return $request;
+        $parameters = [
+            'key' => $this->getApiKey(),
+            'sensor' => $this->getSensor() ? 'true' : 'false',
+        ];
+
+        return static::API_ENDPOINT.http_build_query($parameters);
     }
 
     /**

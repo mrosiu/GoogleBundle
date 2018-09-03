@@ -119,35 +119,31 @@ class StaticMap extends AbstractMap
 
     public function render()
     {
-        $request  = static::API_ENDPOINT;
-        if ($this->hasMeta()) {
-            foreach ($this->getMeta() as $key => $val) {
-                $request .= $key.'='.$val.'&';
+        return sprintf('<img id="%s" src="%s" />', $this->getId(), $this->getGoogleMapLibrary());
+    }
+
+    public function getGoogleMapLibrary()
+    {
+        $parameters = $this->hasMeta() ? $this->getMeta() : [];
+        $parameters['key'] = $this->getApiKey();
+        $parameters['sensor'] = $this->getSensor() ? 'true' : false;
+
+        foreach ($this->getMarkers() as $marker) {
+            $markers = '';
+            if ($marker->hasMeta()) {
+                foreach ($marker->getMeta() as $mkey => $mval) {
+                    $markers .= $mkey.':'.$mval.'|';
+                }
             }
+            if ($latitude = $marker->getLatitude()) {
+                $markers .= $latitude;
+            }
+            if ($longitude = $marker->getLongitude()) {
+                $markers .= ','.$longitude;
+            }
+            $parameters['markers'] = $markers;
         }
-        if ($this->getSensor()) {
-            $request .= 'sensor=true&';
-        } else {
-            $request .= 'sensor=false&';
-        }
-        if ($this->hasMarkers()) {
-            foreach ($this->getMarkers() as $marker) {
-                $request .= 'markers=';
-                if ($marker->hasMeta()) {
-                    foreach ($marker->getMeta() as $mkey => $mval) {
-                        $request .= $mkey.':'.$mval.'|';
-                    }
-                }
-                if ($latitude = $marker->getLatitude()) {
-                    $request .= $latitude;
-                }
-                if ($longitude = $marker->getLongitude()) {
-                    $request .= ','.$longitude;
-                }
-            }	
-        }
-        $request = rtrim($request, "& ");
-        $out = '<img id="'.$this->getId().'" src="'.$request.'" />';
-        return $out;
+
+        return static::API_ENDPOINT.http_build_query($parameters);
     }
 }
